@@ -1,0 +1,105 @@
+---
+title: "Práctica de Regresión lineal simple"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+editor_options: 
+  chunk_output_type: inline
+---
+
+Brummelman, Nevicka y O'Brien (2021) afirman lo siguiente en el *abstract* del artículo:
+
+Algunos líderes muestran un alto nivele de narcisismo. ¿Existe un vínculo entre el nivel de narcisismo y el liderazgo en la infancia? Hasta donde sabemos, hemos llevado a cabo el primer estudio de la relación entre el nivel de narcisismo y varios aspectos del liderazgo en niñas(os) (N = 332, edades 7-14 años). Evaluamos los niveles de narcisismo utilizando la Escala de narcisismo infantil y evaluamos el surgimiento del liderazgo en el aula utilizando las nominaciones de los(as) compañeras(os). Luego, los(as) niñas(os) realizaron una tarea grupal en la que un(a) niño(a) fue asignado al azar como líder. Evaluamos el funcionamiento del liderazgo percibido y real. Los(as) niños(as) con niveles más altos de narcisismo emergieron con mayor frecuencia como líderes en el aula. Cuando se les asignó un papel de liderazgo en la tarea, las(os) niñas(os) con niveles más altos de narcisismo se percibieron a sí mismas(os) como mejores líderes, pero su funcionamiento de liderazgo real no difirió significativamente del de otras(os) líderes. Los análisis de la curva de especificación corroboraron estos hallazgos. Por lo tanto, las(os) niños(as) con niveles de narcisismo relativamente altos tienden a emerger como líderes, aunque no sobresalgan.
+
+Estos paquetes deben estar instalados.
+
+```{r}
+#| eval: false
+install.packages("haven")
+install.packages("dplyr")
+install.packages("tidyr")
+```
+
+Con la función `library()`, active los paquetes **readr**, **dplyr** y **tidyr**.
+
+```{r}
+
+```
+
+Lea el archivo de datos **narcissism.sav** con la función `read_sav()` y guarde los datos en un objeto denominado `narcissism`.
+
+```{r}
+
+```
+
+Seleccione las columnas `N1`, `N2`, ... `N10` y `Lnominations`. Guárdelas en un objeto llamado `narcissism`.
+
+```{r}
+
+```
+
+Elimine las filas con al menos un valor perdido (`NA`).
+
+```{r}
+
+```
+
+Calcule los niveles de narcisismo de cada participante.
+
+```{r}
+narcissism <- narcissism |>
+  mutate(totalScore = rowMeans(across(N1:N10)))
+```
+
+Genere un histograma de `totalScore` y de `Lnominations`.
+
+```{r}
+
+```
+
+Genere un gráfico de dispersión para visualizar la relación entre la variable de respuesta y el predictor.
+
+```{r}
+with(narcissism, plot())
+```
+
+Estime un modelo compacto y un modelo aumentado. Utilice `totalScore` como variable de respuesta.
+
+```{r}
+
+```
+
+Muestre la distribución de los errores de ambos modelos. ¿Tienen una distribución normal centrada en 0?
+
+```{r}
+
+```
+
+Sí, los residuos muestran una distribución normal alrededor de 0.
+
+Con la función `anova()` compare ambos modelos para determinar si el predictor disminuye significativamente el error.
+
+```{r}
+
+```
+
+Muestre las estimaciones del intercepto ($\beta_0$) y de la pendiente de regresión ($\beta_1$). Explique cómo se interpretan ambos parámetros $\beta_1$.
+
+```{r}
+
+```
+
+El modelo predice una puntuación de aproximadamente 1.16 en narcisismo para un(a) niña(o) sin nominaciones como líder.
+
+Por cada nominación como líder, el modelo predice un incremento de aproximadamente 0.036 unidades en la puntuación total de narcisismo.
+
+Muestre los intervalos de confianza (95%) de $b_0$ y $b_1$. Indique si el intervalo de confianza de $b_1$ incluye el 0.
+
+```{r}
+
+```
+
+# Referencia
+
+Brummelman, E., Nevicka, B., & O'Brien, J. M. (2021). Narcissism and leadership in children. *Psychological Science*, *32*(3), 354-363.

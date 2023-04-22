@@ -1,0 +1,245 @@
+---
+title: "Regresión lineal simple"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| eval: false
+install.packages("readr")
+install.packages("dplyr")
+```
+
+```{r}
+library(readr)
+library(dplyr)
+```
+
+# Modelo de dos parámetros
+
+Hasta ahora nos hemos enfocado en los siguientes modelos:
+
+$$
+\text{DATOS} = \text{MODELO} + \text{ERROR}
+$$
+
+$$
+Y_i = B_0 + \varepsilon_i \text{ (Cero parámetros)}
+$$
+
+$$
+Y_i = \beta_0 + \varepsilon_i \text{ (Un parámetro)}
+$$
+
+$$
+Y_i = \beta_0 + \beta_1X_i + \varepsilon_i \text{ (Dos parámetros)}
+$$
+
+En el modelo de dos parámetros, el valor de $Y_i$ depende tanto de una constante/intercepto y del valor del predictor $X_i$.
+
+Un predictor $X_i$ puede ser categórico (en R, estas variables son de tipo `factor`) o puede ser continuo (en R, estas variables son de tipo `integer` o `double`).
+
+| Predictor(es)               | Cantidad de predictores | Nombre de técnica                           |
+|-----------------------------|-------------------------|---------------------------------------------|
+| Continuo                    | 1                       | Regresión lineal simple                     |
+| Continuos                   | 2 o más                 | Regresión lineal múltiple                   |
+| Categórico                  | 1                       | ANOVA (de una vía, de un factor, *one-way*) |
+| Categóricos                 | 2 o más                 | ANOVA factorial                             |
+| Categórico(s) y continuo(s) | 2 o más                 | ANCOVA                                      |
+
+Independientemente de cuáles y cuántos predictores,
+
+1.  siempre se busca minimizar la suma de errores al cuadrados y
+
+2.  la inferencia estadística se basa en la comparación de un modelo C(ompacto) y un modelo A(umentado) mediante un estadístico de prueba $F$.
+
+Por ahora, solo trabajaremos con predictores continuos.
+
+```{r}
+reading <- read_delim(file = "wideReading.csv", delim = ";")
+```
+
+```{r}
+modeloA <- lm(w_accuracy_pretest ~ 1 + nw_accuracy_pretest, data = reading)
+```
+
+# Interpretación de los parámetros
+
+Para obtener las estimaciones de los parámetros $\beta_0$ y $\beta_1$ podemos utilizar la función `coef()`.
+
+```{r}
+coef(modeloA)
+```
+
+`(Intercept)`: Estimación $b_0$ del parámetro $\beta_0$. Valor predicho $\hat{Y_i}$ para la variable de respuesta $Y$ cuando el predictor $X$ es igual 0.
+
+```{r}
+ceros <- which(reading$nw_accuracy_pretest == 0)
+fitted(modeloA)[ceros]
+```
+
+`nw_accuracy_pretest`: Estimación $b_1$ del parámetro $\beta_1$. Pendiente de regresión o ajuste condicional del intercepto. Cuando $X$ cambia en 1 unidad, el valor predicho de $Y$ ($\hat{Y}$) cambia en $b_1$ unidades.
+
+```{r}
+reading$nw_accuracy_pretest[c(131, 3)]
+```
+
+```{r}
+fitted(modeloA)[c(131, 3)]
+```
+
+```{r}
+-0.7160619 - -1.0810626
+```
+
+Al tratarse de un modelo lineal, el cambio en $\hat{Y}$ es el mismo sin importar cuáles valores de $X$ seleccionemos.
+
+```{r}
+plot(reading$w_accuracy_pretest, reading$nw_accuracy_pretest)
+abline(reg = modeloA, col = "blue", lwd = 2)
+segments(x0 = 0, y0 = -3, x1 = 0, y1 = -0.3510612, col="gray", lwd=2)
+segments(x0 = 0, y0 = -0.3510612, x1 = -3, y1 = -0.3510612, col="gray", lwd=2)
+```
+
+Entonces:
+
+1.  $b_0$ es **un valor** predicho $\hat{Y_i}$ dado un valor de $X$, específicamente para $X_i = 0$.
+
+2.  $b_1$ es **una diferencia** entre dos valores predichos $\hat{Y_2} - \hat{Y_1}$, específicamente cuando $X_2 - X_1 = 1$.
+
+En las páginas 77 y 78 del libro se explica cómo se estiman los parámetros $\beta_0$ y $\beta_1$ para obtener $b_0$ y $b_1$, los cuales minimizan el SSE (*Sum of Squared Errors*).
+
+# Prueba de hipótesis
+
+Ahora necesitamos hacer inferencia estadística sobre el parámetro de interés: $\beta_1$. Específicamente, nos interesa poner a prueba la hipótesis nula de que $\beta_1 = 0$.
+
+$$
+\text{MODELO A: } Y_i = \beta_0 + \beta_1X_i + \varepsilon_i
+$$
+
+$$
+\text{MODELO C: } Y_i = \beta_0 + 0X_i + \varepsilon_i = \beta_0 + \varepsilon_i
+$$
+
+```{r}
+modeloC <- lm(w_accuracy_pretest ~ 1, data = reading)
+```
+
+```{r}
+anova(modeloC, modeloA)
+```
+
+`Res.Df` (*Residuals Degrees of freedom*): Diferencia entre cantidad de participantes y parámetros del modelo respectivo.
+
+`RSS` (*Residual Sum of Squares*): SSE (*Sum of Squared Errors*) de cada modelo.
+
+`Sum of Sq` (*Sum of Squares*): SSR (*Sum of Squares Reduced*) de cada modelo, diferencia entre los SSE de cada modelo.
+
+`F`: Valor observado del estadístico de prueba $F$.
+
+`Pr(>F)`: Significancia estadística, valor p, probabilidad de observar una $F$ igual o más grande si se asume que los errores de ambos modelos son iguales.
+
+El valor debajo de `Pr(>F)` (2.245e-05) se puede expresar en notación decimal con la función `format()`. También puede ejecutar `options(scipen = 999)` si desea ver todos los resultados en notación decimal.
+
+```{r}
+format(2.245e-05, scientific=FALSE)
+```
+
+Dado que el valor de la $F$ (19.165) es estadísticamente significativo (menor a 0.05), rechazamos la hipótesis nula de que $\beta_1 = 0$.
+
+# Distribución de los errores
+
+Veamos cómo se distribuyen los errores.
+
+```{r}
+hist(residuals(modeloA))
+```
+
+```{r}
+boxplot(residuals(modeloA))
+```
+
+# Intervalos de confianza
+
+Adicionalmente, podemos estimar los **intervalos de confianza** alrededor de $b_1$ y $b_0$.
+
+```{r}
+confint(modeloA, level = 0.95)
+```
+
+Nótese que el valor 0 no está incluido en el intervalo de confianza de $b_1$, el cual corresponde al coeficiente asociado al predictor `nw_accuracy_pretest`. Esto es congruente con el rechazo de la hipótesis nula de que de que $\beta_1 = 0$.
+
+En las páginas 92 y 99 del libro se muestran las fórmulas para calcular los intervalos de confianza de $b_1$ y $b_0$.
+
+$$
+b_1 \pm \sqrt{\frac{F_{crit; 1, n-2} \cdot MSE}{(n-1)\cdot s_X^2}}
+$$
+
+```{r}
+PA <- 2
+PC <- 1
+n <- 151
+F_crit <- qf(0.95, df1 = PA-PC, df2 = n-PA)
+MSE <- sigma(modeloA)^2
+s2X <- var(reading$nw_accuracy_pretest)
+
+0.3650007 - sqrt((F_crit * MSE) / ((n - 1) * s2X))
+0.3650007 + sqrt((F_crit * MSE) / ((n - 1) * s2X))
+```
+
+## Interpretación
+
+Un intervalo de confianza del 95% **no significa** que exista una probabilidad del 95% de que el valor verdadero del parámetro esté incluido en el intervalo.
+
+En [este sitio web](https://training.cochrane.org/handbook/current/chapter-15#section-15-2) se indica lo siguiente con respecto a la interpretación de los intervalos de confianza: *Un intervalo de confianza del 95% a menudo se interpreta como un rango dentro del cual podemos estar seguros en un 95% de que se encuentra el efecto verdadero. Esta afirmación es una interpretación vaga, pero es útil como guía aproximada. La interpretación estrictamente correcta de un intervalo de confianza se basa en la noción hipotética de considerar los resultados que se obtendrían si el estudio se repitiera muchas veces. **Si un estudio se repitiera infinitamente a menudo, y en cada ocasión se calculara un intervalo de confianza del 95%, entonces el 95% de estos intervalos contendrían el efecto verdadero***.
+
+```{r}
+N <- 10000
+POBLACION <- tibble(
+  ERRORES = rnorm(N, mean = 0, sd = 1),
+  X = rnorm(N, mean = 0, sd = 1),
+  Y = -0.3511 + 0.3650*X + ERRORES)
+```
+
+```{r}
+n <- 4
+
+muestra <- sample_n(POBLACION, n, replace = TRUE) |>
+  rename(x = X, y = Y) |>
+  select(x, y)
+
+modelo <- lm(y ~ 1 + x, data = muestra)
+
+b1 <- coef(modelo)[["x"]]
+lb <- confint(modelo)["x", "2.5 %"]
+ub <- confint(modelo)["x", "97.5 %"]
+
+c(lb, b1, ub)
+between(0.3650, lb, ub)
+```
+
+```{r}
+n <- 4
+incluye <- vector(mode = "logical")
+
+for (i in 1:1000) {
+
+  muestra <- sample_n(POBLACION, n, replace = TRUE) |>
+    rename(x = X, y = Y) |>
+    select(x, y)
+  
+  modelo <- lm(y ~ 1 + x, data = muestra)
+  
+  b1 <- coef(modelo)[["x"]]
+  lb <- confint(modelo)["x", "2.5 %"]
+  ub <- confint(modelo)["x", "97.5 %"]
+  
+  incluye[i] <- between(0.3650, lb, ub)
+}
+
+sum(incluye)/length(incluye)
+```
