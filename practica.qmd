@@ -5,12 +5,12 @@ format:
     embed-resources: true
 editor: visual
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 Brummelman, Nevicka y O'Brien (2021) afirman lo siguiente en el *abstract* del artículo:
 
-Algunos líderes muestran un alto nivele de narcisismo. ¿Existe un vínculo entre el nivel de narcisismo y el liderazgo en la infancia? Hasta donde sabemos, hemos llevado a cabo el primer estudio de la relación entre el nivel de narcisismo y varios aspectos del liderazgo en niñas(os) (N = 332, edades 7-14 años). Evaluamos los niveles de narcisismo utilizando la Escala de narcisismo infantil y evaluamos el surgimiento del liderazgo en el aula utilizando las nominaciones de los(as) compañeras(os). Luego, los(as) niñas(os) realizaron una tarea grupal en la que un(a) niño(a) fue asignado al azar como líder. Evaluamos el funcionamiento del liderazgo percibido y real. Los(as) niños(as) con niveles más altos de narcisismo emergieron con mayor frecuencia como líderes en el aula. Cuando se les asignó un papel de liderazgo en la tarea, las(os) niñas(os) con niveles más altos de narcisismo se percibieron a sí mismas(os) como mejores líderes, pero su funcionamiento de liderazgo real no difirió significativamente del de otras(os) líderes. Los análisis de la curva de especificación corroboraron estos hallazgos. Por lo tanto, las(os) niños(as) con niveles de narcisismo relativamente altos tienden a emerger como líderes, aunque no sobresalgan.
+Algunos líderes muestran un alto nivel de narcisismo. ¿Existe un vínculo entre el nivel de narcisismo y el liderazgo en la infancia? Hasta donde sabemos, hemos llevado a cabo el primer estudio de la relación entre el nivel de narcisismo y varios aspectos del liderazgo en niñas(os) (N = 332, edades 7-14 años). Evaluamos los niveles de narcisismo utilizando la Escala de narcisismo infantil y evaluamos el surgimiento del liderazgo en el aula utilizando las nominaciones de los(as) compañeras(os). Luego, los(as) niñas(os) realizaron una tarea grupal en la que un(a) niño(a) fue asignado al azar como líder. Evaluamos el funcionamiento del liderazgo percibido y real. Los(as) niños(as) con niveles más altos de narcisismo emergieron con mayor frecuencia como líderes en el aula. Cuando se les asignó un papel de liderazgo en la tarea, las(os) niñas(os) con niveles más altos de narcisismo se percibieron a sí mismas(os) como mejores líderes, pero su funcionamiento de liderazgo real no difirió significativamente del de otras(os) líderes. Los análisis de la curva de especificación corroboraron estos hallazgos. Por lo tanto, las(os) niños(as) con niveles de narcisismo relativamente altos tienden a emerger como líderes, aunque no sobresalgan.
 
 Estos paquetes deben estar instalados.
 
@@ -21,7 +21,7 @@ install.packages("dplyr")
 install.packages("tidyr")
 ```
 
-Con la función `library()`, active los paquetes **readr**, **dplyr** y **tidyr**.
+Con la función `library()`, active los paquetes **haven**, **dplyr** y **tidyr**.
 
 ```{r}
 
@@ -52,19 +52,13 @@ narcissism <- narcissism |>
   mutate(totalScore = rowMeans(across(N1:N10)))
 ```
 
-Genere un histograma de `totalScore` y de `Lnominations`.
-
-```{r}
-
-```
-
-Genere un gráfico de dispersión para visualizar la relación entre la variable de respuesta y el predictor.
+Genere un gráfico de dispersión para visualizar la relación entre `totalScore` y `Lnominations`.
 
 ```{r}
 with(narcissism, plot())
 ```
 
-Estime un modelo compacto y un modelo aumentado. Utilice `totalScore` como variable de respuesta.
+Estime un modelo C y un modelo A. Utilice `totalScore` como variable de respuesta.
 
 ```{r}
 

@@ -225,11 +225,12 @@ Un intervalo de confianza del 95% **no significa** que exista una probabilidad d
 En [este sitio web](https://training.cochrane.org/handbook/current/chapter-15#section-15-2) se indica lo siguiente con respecto a la interpretación de los intervalos de confianza: *Un intervalo de confianza del 95% a menudo se interpreta como un rango dentro del cual podemos estar seguros en un 95% de que se encuentra el efecto verdadero. Esta afirmación es una interpretación vaga, pero es útil como guía aproximada. La interpretación estrictamente correcta de un intervalo de confianza se basa en la noción hipotética de considerar los resultados que se obtendrían si el estudio se repitiera muchas veces. **Si un estudio se repitiera infinitamente a menudo, y en cada ocasión se calculara un intervalo de confianza del 95%, entonces el 95% de estos intervalos contendrían el efecto verdadero***.
 
 ```{r}
-N <- 10000
+N <- 1e6
+beta1 <- 0.3650007
 POBLACION <- tibble(
   ERRORES = rnorm(N, mean = 0, sd = 1),
   X = rnorm(N, mean = 0, sd = 1),
-  Y = -0.3511 + 0.3650*X + ERRORES)
+  Y = -0.3511 + beta1*X + ERRORES)
 ```
 
 ```{r}
@@ -246,7 +247,7 @@ li <- confint(modelo)["x", "2.5 %"]
 ls <- confint(modelo)["x", "97.5 %"]
 
 c(li, b1, ls)
-between(0.3650, li, ls)
+between(beta1, li, ls)
 ```
 
 ```{r}
@@ -265,7 +266,7 @@ for (i in 1:1000) {
   li <- confint(modelo)["x", "2.5 %"]
   ls <- confint(modelo)["x", "97.5 %"]
   
-  incluye[i] <- between(0.3650, li, ls)
+  incluye[i] <- between(beta1, li, ls)
 }
 
 sum(incluye)/length(incluye)
