@@ -21,7 +21,7 @@ library(dplyr)
 
 # Modelo de dos parámetros
 
-Hasta ahora nos hemos enfocado en los siguientes modelos:
+Hasta ahora nos hemos enfocado más en los siguientes modelos:
 
 $$
 \text{DATOS} = \text{MODELO} + \text{ERROR}
@@ -39,12 +39,14 @@ $$
 Y_i = \beta_0 + \beta_1X_i + \varepsilon_i \text{ (Dos parámetros)}
 $$
 
-En el modelo de dos parámetros, el valor de $Y_i$ depende tanto de una constante/intercepto y del valor del predictor $X_i$.
+En el modelo de dos parámetros, el valor predichp para cada $Y_i$ depende tanto del intercepto $\beta_0$ como del valor del predictor $X_i$.
 
-Un predictor $X_i$ puede ser categórico (en R, estas variables son de tipo `factor`) o puede ser continuo (en R, estas variables son de tipo `integer` o `double`).
+Un predictor $X_i$ puede ser categórico (en R, columnas tipo `character` o tipo `factor`) o puede ser continuo (columnas `numeric`, ya sean tipo `integer` o tipo `double`).
+
+En los modelos lineales con **una variable de respuesta** **continua**:
 
 | Predictor(es)               | Cantidad de predictores | Nombre de técnica                           |
-|-----------------------------|-------------------------|---------------------------------------------|
+|---------------------|-------------------|--------------------------------|
 | Continuo                    | 1                       | Regresión lineal simple                     |
 | Continuos                   | 2 o más                 | Regresión lineal múltiple                   |
 | Categórico                  | 1                       | ANOVA (de una vía, de un factor, *one-way*) |
@@ -53,9 +55,9 @@ Un predictor $X_i$ puede ser categórico (en R, estas variables son de tipo `fac
 
 Independientemente de cuáles y cuántos predictores,
 
-1.  siempre se busca minimizar la suma de errores al cuadrados y
+1.  siempre se busca **minimizar** **la suma de errores al cuadrado** y
 
-2.  la inferencia estadística se basa en la comparación de un modelo C(ompacto) y un modelo A(umentado) mediante un estadístico de prueba $F$.
+2.  la inferencia estadística se basa en la **comparación** de un modelo C(ompacto) y un modelo A(umentado) mediante un estadístico de prueba $F$.
 
 Por ahora, solo trabajaremos con predictores continuos.
 
@@ -100,9 +102,16 @@ Al tratarse de un modelo lineal, el cambio en $\hat{Y}$ es el mismo sin importar
 
 ```{r}
 plot(reading$w_accuracy_pretest, reading$nw_accuracy_pretest)
-abline(reg = modeloA, col = "blue", lwd = 2)
-segments(x0 = 0, y0 = -3, x1 = 0, y1 = -0.3510612, col="gray", lwd=2)
-segments(x0 = 0, y0 = -0.3510612, x1 = -3, y1 = -0.3510612, col="gray", lwd=2)
+abline(reg = modeloA)
+
+segments(x0 = 0, y0 = -3, x1 = 0, y1 = -0.3510612, col="red", lwd=2)
+segments(x0 = 0, y0 = -0.3510612, x1 = -3, y1 = -0.3510612, col="red")
+
+segments(x0 = -1, y0 = -3, x1 = -1, y1 = -0.7160619, col="blue", lwd=2)
+segments(x0 = -1, y0 = -0.7160619, x1 = -3, y1 = -0.7160619, col="blue")
+
+segments(x0 = -2, y0 = -3, x1 = -2, y1 = -1.0810626, col="blue", lwd=2)
+segments(x0 = -2, y0 = -1.0810626, x1 = -3, y1 = -1.0810626, col="blue")
 ```
 
 Entonces:
@@ -137,19 +146,23 @@ anova(modeloC, modeloA)
 
 `RSS` (*Residual Sum of Squares*): SSE (*Sum of Squared Errors*) de cada modelo.
 
+`Df` (*Degrees of freedom*): Diferencia entre los `Res.Df` de cada modelo.
+
 `Sum of Sq` (*Sum of Squares*): SSR (*Sum of Squares Reduced*) de cada modelo, diferencia entre los SSE de cada modelo.
 
 `F`: Valor observado del estadístico de prueba $F$.
 
 `Pr(>F)`: Significancia estadística, valor p, probabilidad de observar una $F$ igual o más grande si se asume que los errores de ambos modelos son iguales.
 
-El valor debajo de `Pr(>F)` (2.245e-05) se puede expresar en notación decimal con la función `format()`. También puede ejecutar `options(scipen = 999)` si desea ver todos los resultados en notación decimal.
+El valor de `Pr(>F)` (2.245e-05) se puede expresar en notación decimal con la función `format()`. También puede ejecutar `options(scipen = 999)` si desea ver todos los resultados en notación decimal.
 
 ```{r}
 format(2.245e-05, scientific=FALSE)
 ```
 
 Dado que el valor de la $F$ (19.165) es estadísticamente significativo (menor a 0.05), rechazamos la hipótesis nula de que $\beta_1 = 0$.
+
+Este resultado equivale a rechazar el modelo C en favor del modelo A, es decir, el predictor `nw_accuracy_pretest` es capaz de predecir algo de la variabilidad observada en `w_accuracy_pretest` .
 
 # Distribución de los errores
 
@@ -160,7 +173,7 @@ hist(residuals(modeloA))
 ```
 
 ```{r}
-boxplot(residuals(modeloA))
+boxplot(residuals(modeloA), main = "Boxplot of residuals(modeloA)")
 ```
 
 # Intervalos de confianza
@@ -171,20 +184,34 @@ Adicionalmente, podemos estimar los **intervalos de confianza** alrededor de $b_
 confint(modeloA, level = 0.95)
 ```
 
-Nótese que el valor 0 no está incluido en el intervalo de confianza de $b_1$, el cual corresponde al coeficiente asociado al predictor `nw_accuracy_pretest`. Esto es congruente con el rechazo de la hipótesis nula de que de que $\beta_1 = 0$.
+Nótese que el valor 0 no está incluido en el intervalo de confianza de $b_1$. Esto es congruente con el rechazo de la hipótesis nula de que de que $\beta_1 = 0$.
 
 En las páginas 92 y 99 del libro se muestran las fórmulas para calcular los intervalos de confianza de $b_1$ y $b_0$.
+
+Por ahora, nos concentraremos en $b_1$.
 
 $$
 b_1 \pm \sqrt{\frac{F_{crit; 1, n-2} \cdot MSE}{(n-1)\cdot s_X^2}}
 $$
 
 ```{r}
+
+# Cantidad de parámetros de modelo A
 PA <- 2
+
+# Cantidad de parámetros de modelo C
 PC <- 1
+
+# Cantidad de participantes
 n <- 151
-F_crit <- qf(0.95, df1 = PA-PC, df2 = n-PA)
+
+# F crítica
+F_crit <- qf(0.95, df1 = PA - PC, df2 = n - PA)
+
+# Media del error cuadrático
 MSE <- sigma(modeloA)^2
+
+# Varianza del predictor
 s2X <- var(reading$nw_accuracy_pretest)
 
 0.3650007 - sqrt((F_crit * MSE) / ((n - 1) * s2X))
@@ -206,7 +233,7 @@ POBLACION <- tibble(
 ```
 
 ```{r}
-n <- 4
+n <- 151
 
 muestra <- sample_n(POBLACION, n, replace = TRUE) |>
   rename(x = X, y = Y) |>
@@ -215,15 +242,15 @@ muestra <- sample_n(POBLACION, n, replace = TRUE) |>
 modelo <- lm(y ~ 1 + x, data = muestra)
 
 b1 <- coef(modelo)[["x"]]
-lb <- confint(modelo)["x", "2.5 %"]
-ub <- confint(modelo)["x", "97.5 %"]
+li <- confint(modelo)["x", "2.5 %"]
+ls <- confint(modelo)["x", "97.5 %"]
 
-c(lb, b1, ub)
-between(0.3650, lb, ub)
+c(li, b1, ls)
+between(0.3650, li, ls)
 ```
 
 ```{r}
-n <- 4
+n <- 151
 incluye <- vector(mode = "logical")
 
 for (i in 1:1000) {
@@ -235,10 +262,10 @@ for (i in 1:1000) {
   modelo <- lm(y ~ 1 + x, data = muestra)
   
   b1 <- coef(modelo)[["x"]]
-  lb <- confint(modelo)["x", "2.5 %"]
-  ub <- confint(modelo)["x", "97.5 %"]
+  li <- confint(modelo)["x", "2.5 %"]
+  ls <- confint(modelo)["x", "97.5 %"]
   
-  incluye[i] <- between(0.3650, lb, ub)
+  incluye[i] <- between(0.3650, li, ls)
 }
 
 sum(incluye)/length(incluye)
