@@ -5,7 +5,7 @@ format:
     embed-resources: true
 editor: visual
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 Brummelman, Nevicka y O'Brien (2021) afirman lo siguiente en el *abstract* del artículo:
@@ -24,25 +24,27 @@ install.packages("tidyr")
 Con la función `library()`, active los paquetes **haven**, **dplyr** y **tidyr**.
 
 ```{r}
-
+library("haven")
+library("dplyr")
+library("tidyr")
 ```
 
 Lea el archivo de datos **narcissism.sav** con la función `read_sav()` y guarde los datos en un objeto denominado `narcissism`.
 
 ```{r}
-
+narcissism <- read_sav("narcissism.sav")
 ```
 
 Seleccione las columnas `N1`, `N2`, ... `N10` y `Lnominations`. Guárdelas en un objeto llamado `narcissism`.
 
 ```{r}
-
+narcissism <- select(narcissism, N1:N10, Lnominations)
 ```
 
 Elimine las filas con al menos un valor perdido (`NA`).
 
 ```{r}
-
+narcissism <- drop_na(narcissism)
 ```
 
 Calcule los niveles de narcisismo de cada participante.
@@ -55,19 +57,21 @@ narcissism <- narcissism |>
 Genere un gráfico de dispersión para visualizar la relación entre `totalScore` y `Lnominations`.
 
 ```{r}
-with(narcissism, plot())
+with(narcissism, plot(totalScore, Lnominations))
 ```
 
 Estime un modelo C y un modelo A. Utilice `totalScore` como variable de respuesta.
 
 ```{r}
-
+modeloC <- lm(totalScore ~ 1, data = narcissism)
+modeloA <- lm(totalScore ~ 1 + Lnominations, data = narcissism)
 ```
 
 Muestre la distribución de los errores de ambos modelos. ¿Tienen una distribución normal centrada en 0?
 
 ```{r}
-
+hist(residuals(modeloA))
+hist(residuals(modeloC))
 ```
 
 Sí, los residuos muestran una distribución normal alrededor de 0.
@@ -75,13 +79,13 @@ Sí, los residuos muestran una distribución normal alrededor de 0.
 Con la función `anova()` compare ambos modelos para determinar si el predictor disminuye significativamente el error.
 
 ```{r}
-
+anova(modeloC, modeloA)
 ```
 
 Muestre las estimaciones del intercepto ($\beta_0$) y de la pendiente de regresión ($\beta_1$). Explique cómo se interpretan ambos parámetros $\beta_1$.
 
 ```{r}
-
+coef(modeloA)
 ```
 
 El modelo predice una puntuación de aproximadamente 1.16 en narcisismo para un(a) niña(o) sin nominaciones como líder.
@@ -91,8 +95,10 @@ Por cada nominación como líder, el modelo predice un incremento de aproximadam
 Muestre los intervalos de confianza (95%) de $b_0$ y $b_1$. Indique si el intervalo de confianza de $b_1$ incluye el 0.
 
 ```{r}
-
+confint(modeloA, level = 0.95)
 ```
+
+No incluye el 0.
 
 # Referencia
 
