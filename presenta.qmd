@@ -39,14 +39,14 @@ $$
 Y_i = \beta_0 + \beta_1X_i + \varepsilon_i \text{ (Dos parámetros)}
 $$
 
-En el modelo de dos parámetros, el valor predichp para cada $Y_i$ depende tanto del intercepto $\beta_0$ como del valor del predictor $X_i$.
+En el modelo de dos parámetros, el valor predicho para cada $Y_i$ depende tanto del intercepto $\beta_0$ como del valor del predictor $X_i$.
 
 Un predictor $X_i$ puede ser categórico (en R, columnas tipo `character` o tipo `factor`) o puede ser continuo (columnas `numeric`, ya sean tipo `integer` o tipo `double`).
 
 En los modelos lineales con **una variable de respuesta** **continua**:
 
 | Predictor(es)               | Cantidad de predictores | Nombre de técnica                           |
-|---------------------|-------------------|--------------------------------|
+|-----------------------------|-------------------------|---------------------------------------------|
 | Continuo                    | 1                       | Regresión lineal simple                     |
 | Continuos                   | 2 o más                 | Regresión lineal múltiple                   |
 | Categórico                  | 1                       | ANOVA (de una vía, de un factor, *one-way*) |
